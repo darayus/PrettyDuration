@@ -1,6 +1,61 @@
 
 use chrono::Duration;
 
+#[derive(Debug, Eq, PartialEq)]
+pub enum TimePeriod {
+    Year(u64),
+    Month(u64),
+    Week(u64),
+    Day(u64),
+    Hour(u64),
+    Minute(u64),
+    Second(u64),
+    Millisecond(u64),
+}
+
+impl TimePeriod {
+    pub fn val(&self) -> u64 {
+        match *self {
+            TimePeriod::Year(v) => v,
+            TimePeriod::Month(v) => v,
+            TimePeriod::Week(v) => v,
+            TimePeriod::Day(v) => v,
+            TimePeriod::Hour(v) => v,
+            TimePeriod::Minute(v) => v,
+            TimePeriod::Second(v) => v,
+            TimePeriod::Millisecond(v) => v,
+        }
+    }
+
+    pub fn str_name(&self) -> &str {
+        match *self {
+            TimePeriod::Year(_) => "year",
+            TimePeriod::Month(_) => "month",
+            TimePeriod::Week(_) => "week",
+            TimePeriod::Day(_) => "day",
+            TimePeriod::Hour(_) => "hour",
+            TimePeriod::Minute(_) => "minute",
+            TimePeriod::Second(_) => "second",
+            TimePeriod::Millisecond(_) => "millisecond",
+        }
+    }
+
+    pub fn is_plural(&self) -> bool {
+        return !(self.val() == 1);
+    }
+
+    pub fn plural_str(&self) -> &str {
+        if self.is_plural() {
+            return "s";
+        }
+        return "";
+    }
+
+    pub fn to_string(&self) -> String {
+        return format!("{} {}{}", self.val(), self.str_name(), self.plural_str());
+    }
+}
+
 pub struct SplitDuration {
     pub years: u64,
     pub months: u64,
@@ -27,14 +82,30 @@ impl SplitDuration {
         }
     }
 
-    pub fn as_vec(&self) -> Vec<u64> {
+    pub fn as_vec(&self) -> Vec<TimePeriod> {
+        return vec![
+            TimePeriod::Year(self.years),
+            TimePeriod::Month(self.months),
+            TimePeriod::Week(self.weeks),
+            TimePeriod::Day(self.days),
+            TimePeriod::Hour(self.hours),
+            TimePeriod::Minute(self.minutes),
+            TimePeriod::Second(self.seconds),
+            TimePeriod::Millisecond(self.milliseconds),
+        ];
+    }
+
+    pub fn as_vec_u64(&self) -> Vec<u64> {
         return vec![self.years, self.months, self.weeks, self.days,
         self.hours, self.minutes, self.seconds, self.milliseconds];
     }
 }
 
 pub fn split_duration(dur: Duration) -> SplitDuration {
-    // TODO: Handle negative durations
+    let dur: Duration = if dur < Duration::seconds(0) {
+        -dur
+    } else {dur};
+
     let mut split = Vec::with_capacity(8);
 
     // Calculate the years
@@ -85,26 +156,26 @@ pub fn split_duration(dur: Duration) -> SplitDuration {
 #[test]
 fn test_split_duration_year_correct() {
     let dur = Duration::days(365);
-    assert_eq!(split_duration(dur).as_vec(), vec![1, 0, 0, 0, 0, 0, 0, 0]);
+    assert_eq!(split_duration(dur).as_vec_u64(), vec![1, 0, 0, 0, 0, 0, 0, 0]);
 
     let dur = Duration::days(366);
-    assert_eq!(split_duration(dur).as_vec(), vec![1, 0, 0, 1, 0, 0, 0, 0]);
+    assert_eq!(split_duration(dur).as_vec_u64(), vec![1, 0, 0, 1, 0, 0, 0, 0]);
 }
 
 #[test]
 fn test_split_duration_hour_correct() {
     let dur = Duration::hours(2);
-    assert_eq!(split_duration(dur).as_vec(), vec![0, 0, 0, 0, 2, 0, 0, 0]);
+    assert_eq!(split_duration(dur).as_vec_u64(), vec![0, 0, 0, 0, 2, 0, 0, 0]);
 
     let dur = Duration::hours(25);
-    assert_eq!(split_duration(dur).as_vec(), vec![0, 0, 0, 1, 1, 0, 0, 0]);
+    assert_eq!(split_duration(dur).as_vec_u64(), vec![0, 0, 0, 1, 1, 0, 0, 0]);
 }
 
 #[test]
 fn test_split_duration_none_correct() {
     let dur = Duration::hours(0);
-    assert_eq!(split_duration(dur).as_vec(), vec![0, 0, 0, 0, 0, 0, 0, 0]);
+    assert_eq!(split_duration(dur).as_vec_u64(), vec![0, 0, 0, 0, 0, 0, 0, 0]);
 
     let dur = Duration::hours(25);
-    assert_eq!(split_duration(dur).as_vec(), vec![0, 0, 0, 1, 1, 0, 0, 0]);
+    assert_eq!(split_duration(dur).as_vec_u64(), vec![0, 0, 0, 1, 1, 0, 0, 0]);
 }
