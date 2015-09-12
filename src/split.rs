@@ -1,77 +1,35 @@
 
 use chrono::Duration;
 
-macro_rules! make_time_period {
-    ($e:expr, $s:ident) => (
-        #[derive(Debug, Eq, PartialEq)]
-        pub struct $s(u64);
-
-        impl $s {
-            pub fn new(val: u64) -> $s {
-                return $s(val);
-            }
-        }
-
-        impl TimePeriod for $s {
-            fn name(&self) -> &str {
-                return $e;
-            }
-            fn value(&self) -> u64 {
-                let $s(v) = *self;
-                return v;
-            }
-        }
-    );
-}
-
-make_time_period!("year", PeriodYear);
-make_time_period!("month", PeriodMonth);
-make_time_period!("week", PeriodWeek);
-make_time_period!("day", PeriodDay);
-make_time_period!("hour", PeriodHour);
-make_time_period!("minute", PeriodMinute);
-make_time_period!("second", PeriodSecond);
-make_time_period!("millisecond", PeriodMillisecond);
-
-pub trait TimePeriod {
-    fn name(&self) -> &str;
-    fn value(&self) -> u64;
-
-    fn is_plural(&self) -> bool {
-        return !(self.value() == 1);
-    }
-}
-
-#[derive(Debug, Eq, PartialEq)]
 pub struct SplitDuration {
-    pub years: PeriodYear,
-    pub months: PeriodMonth,
-    pub weeks: PeriodWeek,
-    pub days: PeriodDay,
-    pub hours: PeriodHour,
-    pub minutes: PeriodMinute,
-    pub seconds: PeriodSecond,
-    pub milliseconds: PeriodMillisecond,
+    pub years: u64,
+    pub months: u64,
+    pub weeks: u64,
+    pub days: u64,
+    pub hours: u64,
+    pub minutes: u64,
+    pub seconds: u64,
+    pub milliseconds: u64,
 }
 
 impl SplitDuration {
     pub fn new(years: u64, months: u64, weeks: u64, days: u64,
         hours: u64, minutes: u64, seconds: u64, milliseconds: u64) -> SplitDuration {
         return SplitDuration {
-            years: PeriodYear::new(years),
-            months: PeriodMonth::new(months),
-            weeks: PeriodWeek::new(weeks),
-            days: PeriodDay::new(days),
-            hours: PeriodHour::new(hours),
-            minutes: PeriodMinute::new(minutes),
-            seconds: PeriodSecond::new(seconds),
-            milliseconds: PeriodMillisecond::new(milliseconds),
+            years: years,
+            months: months,
+            weeks: weeks,
+            days: days,
+            hours: hours,
+            minutes: minutes,
+            seconds: seconds,
+            milliseconds: milliseconds,
         }
     }
 
     pub fn as_vec(&self) -> Vec<u64> {
-        return vec![self.years.value(), self.months.value(), self.weeks.value(), self.days.value(),
-        self.hours.value(), self.minutes.value(), self.seconds.value(), self.milliseconds.value()];
+        return vec![self.years, self.months, self.weeks, self.days,
+        self.hours, self.minutes, self.seconds, self.milliseconds];
     }
 }
 

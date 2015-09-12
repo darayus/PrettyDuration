@@ -1,6 +1,6 @@
 extern crate chrono;
 
-pub mod split;
+mod split;
 
 use chrono::Duration;
 
