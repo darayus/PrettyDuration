@@ -10,7 +10,7 @@ pub fn pretty_short(dur: Duration) -> String {
 
     let final_str = match first_component {
         Some(x) => {
-            match second_component {
+            match second_component.and_then(has_second) {
                 Some(y) => {format!("{} and {}", x.to_string(), y.to_string())},
                 None => {x.to_string()}
             }
@@ -18,6 +18,11 @@ pub fn pretty_short(dur: Duration) -> String {
         // The duration is 0
         None => {split::TimePeriod::Millisecond(0).to_string()},
     };
+
+    fn has_second(val: &split::TimePeriod) -> Option<&split::TimePeriod> {
+        if val.val() == 0 {return None};
+        return Some(val);
+    }
 
     return final_str;
 }
@@ -63,7 +68,7 @@ fn test_pretty_short() {
         (Duration::milliseconds(200), "200 milliseconds"),
         (Duration::seconds(1) + Duration::milliseconds(200), "1 second and 200 milliseconds"),
         (Duration::days(1) + Duration::hours(2), "1 day and 2 hours"),
-        (Duration::days(1) + Duration::seconds(2), "1 day and 0 hours"),
+        (Duration::days(1) + Duration::seconds(2), "1 day"),
     ];
 
     for (dur, final_str) in test_data {
