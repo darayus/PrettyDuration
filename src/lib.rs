@@ -8,13 +8,9 @@ use chrono::*;
 pub use pretty::{pretty_short, pretty_full};
 
 pub trait NaturalTime {
-    fn time_delta(&self) -> String;
-}
-
-impl NaturalTime for DateTime<UTC> {
+    fn time_difference(&self) -> Duration;
     fn time_delta(&self) -> String {
-        let now = UTC::now();
-        let delta = now - *self;
+        let delta = self.time_difference();
         let mut final_str = pretty_short(delta);
 
         if delta < Duration::seconds(0) {
@@ -28,11 +24,34 @@ impl NaturalTime for DateTime<UTC> {
     }
 }
 
+impl NaturalTime for DateTime<UTC> {
+    fn time_difference(&self) -> Duration {
+        let now = UTC::now();
+        return now - *self;
+    }
+}
+
+impl NaturalTime for DateTime<Local> {
+    fn time_difference(&self) -> Duration {
+        let now = Local::now();
+        return now - *self;
+    }
+}
+
 #[test]
 fn test_time_delta_correct() {
     let new_date = UTC::now() + Duration::days(10);
     assert_eq!(new_date.time_delta(), "in 1 week and 2 days");
 
     let new_date = UTC::now() - Duration::days(10);
+    assert_eq!(new_date.time_delta(), "1 week and 3 days ago");
+}
+
+#[test]
+fn test_time_delta_correct_local() {
+    let new_date = Local::now() + Duration::days(10);
+    assert_eq!(new_date.time_delta(), "in 1 week and 2 days");
+
+    let new_date = Local::now() - Duration::days(10);
     assert_eq!(new_date.time_delta(), "1 week and 3 days ago");
 }
