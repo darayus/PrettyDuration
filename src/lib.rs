@@ -27,14 +27,14 @@ pub trait NaturalTime {
 impl NaturalTime for DateTime<UTC> {
     fn time_difference(&self) -> Duration {
         let now = UTC::now();
-        return now - *self;
+        return -self.signed_duration_since(now);
     }
 }
 
 impl NaturalTime for DateTime<Local> {
     fn time_difference(&self) -> Duration {
         let now = Local::now();
-        return now - *self;
+        return -self.signed_duration_since(now);
     }
 }
 
