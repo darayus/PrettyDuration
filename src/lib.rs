@@ -1,9 +1,11 @@
 extern crate chrono;
+extern crate time;
 
 pub mod split;
 pub mod pretty;
 
-use chrono::*;
+use chrono::prelude::*;
+use time::Duration;
 
 pub use pretty::{pretty_short, pretty_full};
 
@@ -24,9 +26,9 @@ pub trait NaturalTime {
     }
 }
 
-impl NaturalTime for DateTime<UTC> {
+impl NaturalTime for DateTime<Utc> {
     fn time_difference(&self) -> Duration {
-        let now = UTC::now();
+        let now = Utc::now();
         return -self.signed_duration_since(now);
     }
 }
@@ -40,10 +42,10 @@ impl NaturalTime for DateTime<Local> {
 
 #[test]
 fn test_time_delta_correct() {
-    let new_date = UTC::now() + Duration::days(10);
+    let new_date = Utc::now() + Duration::days(10);
     assert_eq!(new_date.time_delta(), "in 1 week and 2 days");
 
-    let new_date = UTC::now() - Duration::days(10);
+    let new_date = Utc::now() - Duration::days(10);
     assert_eq!(new_date.time_delta(), "1 week and 3 days ago");
 }
 

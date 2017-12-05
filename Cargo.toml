@@ -1,8 +1,9 @@
 [package]
 name = "pretty_duration"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Darayus Nanavati <darayus.contact@gmail.com>"]
 
 [dependencies]
 
-chrono = "*"
+chrono = "0.4"
+time = "0.1"
